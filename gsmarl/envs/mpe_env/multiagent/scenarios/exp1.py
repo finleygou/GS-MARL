@@ -1,7 +1,9 @@
 import numpy as np
 from gsmarl.envs.mpe_env.multiagent.core import World, Agent, Landmark, Obstacle
 from gsmarl.envs.mpe_env.multiagent.scenario import BaseScenario
-
+'''
+fixed scenario
+'''
 
 class Scenario(BaseScenario):
     def make_world(self, args):

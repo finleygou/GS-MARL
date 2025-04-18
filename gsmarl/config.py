@@ -41,7 +41,7 @@ def get_config():
                         help="for wandb usage.")
     parser.add_argument("--experiment_name", type=str, default="test",
                         help="an identifier to distinguish different experiment.")
-    parser.add_argument("--use_wandb", action='store_false', default=True,
+    parser.add_argument("--use_wandb", action='store_false', default=False,
                         help="for wandb usage.")
 
     # env parameters
@@ -61,7 +61,7 @@ def get_config():
                         help="Whether to use Orthogonal initialization for weights and 0 initialization for biases")
     parser.add_argument("--gain", type=float, default=0.01,
                         help="The gain of ACT layer")
-    parser.add_argument("--gnn_num_heads", type=int, default=1,
+    parser.add_argument("--gnn_num_heads", type=int, default=3,
                         help='head of graph attention')
 
     # recurrent parameters
