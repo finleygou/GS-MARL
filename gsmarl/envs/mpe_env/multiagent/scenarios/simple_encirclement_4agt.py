@@ -62,7 +62,7 @@ class Scenario(BaseScenario):
             target.silent = True
             target.size = 0.12
             target.movable = True
-            target.max_speed = 0.15
+            target.max_speed = 0.12
             target.max_accel = 1.0
 
         # add obstacles
@@ -81,9 +81,8 @@ class Scenario(BaseScenario):
         # random properties for agents
         world.assign_agent_colors()
         world.assign_obstacle_colors()
-        world.assign_landmark_colors()
+        world.assign_target_colors()
 
-        # init_pos_agent = np.array([[-1.2, 0.], [-0.6, 0.0], [0.0, 0.0], [0.6, 0.0], [1.2, 0.0]])
         init_pos_agent = np.array([[-1.2, 0.], [-0.4, 0.0], [0.4, 0.0], [1.2, 0.0]])
         init_pos_agent = init_pos_agent + np.random.randn(*init_pos_agent.shape)*0.01
         for i, agent in enumerate(world.agents):
@@ -96,29 +95,16 @@ class Scenario(BaseScenario):
 
         for i, target in enumerate(world.targets):
             target.done = False
-            target.state.p_pos = np.array([0., 4.])
+            target.state.p_pos = np.array([0., 3.])
             vel_angle = np.random.uniform(np.pi/3, 2*np.pi/3)
             target.state.p_vel = np.array([np.cos(vel_angle), np.sin(vel_angle)])*target.max_speed
-            target.size = 0.1
             target.R = target.size
 
-        # Randomly place obstacles that do not collide with each other
-        obstcle_added = []
-        num_obstacles_added = 0
-        while True:
-            if num_obstacles_added == self.num_obstacles:
-                break
-            random_pos = np.random.uniform(
-                -self.world_size / 2, self.world_size / 2, world.dim_p
-            ) + np.array([0, 2])
-            obstacle_size = world.obstacles[num_obstacles_added].size
-            obs_collision = self.check_obstacle_collision(random_pos, obstacle_size, obstcle_added)
+        init_pos_obstacle = np.array([[-1.31, 2.25], [-0.44, 1.06], [0.32, 2.10], [0.94, 0.88], [1.44, 2.75]])
+        for i, obstacle in enumerate(world.obstacles):
+            obstacle.state.p_pos = init_pos_obstacle[i]
+            obstacle.state.p_vel = np.array([0.0, 0.0])
 
-            if not obs_collision:
-                world.obstacles[num_obstacles_added].state.p_pos = random_pos
-                world.obstacles[num_obstacles_added].state.p_vel = np.zeros(world.dim_p)
-                obstcle_added.append(world.obstacles[num_obstacles_added])
-                num_obstacles_added += 1
 
     def benchmark_data(self, agent, world):
         rew = 0
@@ -166,8 +152,7 @@ class Scenario(BaseScenario):
 
         #################################
         k1, k2, k3 = 0.2, 0.4, 0.8
-        # w1, w2, w3 = 0.2, 0.3, 0.5
-        w1, w2, w3 = 0.2, 0.3, 0.5
+        w1, w2, w3 = 0.3, 0.2, 0.5
 
         # formaion reward r_f
         form_vec = np.array([0.0, 0.0])

@@ -204,6 +204,10 @@ class World(object):
         for landmark in self.landmarks:
             landmark.color = np.array([0.25, 0.25, 0.25])
 
+    # target color
+    def assign_target_colors(self):
+        for target in self.targets:
+            target.color = np.array([0.25, 0.25, 0.25])
 
     # update state of the world
     def step(self):

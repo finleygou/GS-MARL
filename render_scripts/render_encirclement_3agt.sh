@@ -19,12 +19,13 @@ python  ../gsmarl/scripts/render_mpe.py \
 --hidden_size 64 \
 --num_targets 1 --num_agents 3 --num_obstacles 5 --num_landmarks 0 \
 --save_data "False" \
+--save_gifs "False" \
 --use_render "True" \
 --parameter_share "True" \
 --episode_length ${ep_lens} \
 --data_chunk_length 20 \
 --gain 0.01 \
---render_episodes 10 \
+--render_episodes 1 \
 --user_name "finleygou" \
 --model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250423_200541-ws8qu3to/files/"
 done

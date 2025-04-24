@@ -143,7 +143,7 @@ def get_config():
     parser.add_argument("--cost_file_name", type=str, default=None, help="csv name of training cost.")
 
     # render parameters
-    parser.add_argument("--save_gifs", action='store_true', default=True,
+    parser.add_argument("--save_gifs", type=lambda x: bool(strtobool(x)), default=True,
                         help="by default, do not save render video. If set, save video.")
     parser.add_argument("--use_render", type=lambda x: bool(strtobool(x)), default=False,
                         help="render or train.")

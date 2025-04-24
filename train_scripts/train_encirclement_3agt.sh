@@ -10,7 +10,7 @@ do
 echo "seed: ${seed}"
 # execute the script with different params
 python  ../gsmarl/scripts/train_mpe.py \
---device "cuda:0" \
+--device "cuda:1" \
 --use_valuenorm --use_popart \
 --wandb_project_name "Graph_Safe_MARL" \
 --env_name "MPE" \
@@ -23,9 +23,9 @@ python  ../gsmarl/scripts/train_mpe.py \
 --hidden_size 64 \
 --num_targets 1 --num_agents 3 --num_obstacles 5 --num_landmarks 0 \
 --save_data "True" \
---reward_file_name "rew_enc_3agt_NPS" \
---cost_file_name "cost_enc_3agt_NPS" \
---parameter_share "False" \
+--reward_file_name "rew_enc_3agt_PS-v1" \
+--cost_file_name "cost_enc_3agt_NPS-v1" \
+--parameter_share "True" \
 --use_wandb "True" \
 --n_training_threads 128 --n_rollout_threads 16 \
 --episode_length ${ep_lens} \

@@ -44,6 +44,7 @@ class Runner(object):
 
         # model dir
         self.model_dir = self.all_args.model_dir
+        self.save_gifs = self.all_args.save_gifs
 
         if self.use_render:
             import imageio

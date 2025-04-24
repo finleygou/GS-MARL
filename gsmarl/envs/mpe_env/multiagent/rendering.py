@@ -7,7 +7,7 @@ if "Apple" in sys.version:
     if 'DYLD_FALLBACK_LIBRARY_PATH' in os.environ:
         os.environ['DYLD_FALLBACK_LIBRARY_PATH'] += ':/usr/lib'
 
-from gym.utils import reraise
+# from gym.utils import reraise
 from gym import error
 
 try:

@@ -734,12 +734,13 @@ class MultiAgentGraphConstrainEnv(MultiAgentConstrainEnv):
                 pos = np.zeros(self.world.dim_p)
             else:
                 pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(
-                pos[0] - cam_range,
-                pos[0] + cam_range,
-                pos[1] - cam_range,
-                pos[1] + cam_range,
-            )
+            # self.viewers[i].set_bounds(
+            #     pos[0] - cam_range,
+            #     pos[0] + cam_range,
+            #     pos[1] - cam_range,
+            #     pos[1] + cam_range,
+            # )
+            self.viewers[i].set_bounds(-10, 10, -5, 15)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
