@@ -1,5 +1,5 @@
 import argparse
-
+from distutils.util import strtobool
 
 def get_config():
     parser = argparse.ArgumentParser(
@@ -25,13 +25,15 @@ def get_config():
                         help="Which scenario to run on")
     parser.add_argument("--num_obstacles", type=int, default=3,
                         help="number of obstacles")
+    parser.add_argument("--num_targets", type=int, default=1,
+                        help="number of targets")
     parser.add_argument('--num_agents', type=int, default=3,
                         help="number of players")
     parser.add_argument('--num_landmarks', type=int, default=3,
                         help="number of landmarks")
     parser.add_argument("--restore_model", type=bool, default=True,
                         help="for fine tunning/rendering")
-    parser.add_argument("--parameter_share", type=bool, default=True,
+    parser.add_argument("--parameter_share", type=lambda x: bool(strtobool(x)), default=True,
                         help='parameter sharing')
 
     # wandb parameters
@@ -41,10 +43,12 @@ def get_config():
                         help="for wandb usage.")
     parser.add_argument("--experiment_name", type=str, default="test",
                         help="an identifier to distinguish different experiment.")
-    parser.add_argument("--use_wandb", action='store_false', default=False,
+    parser.add_argument("--use_wandb", type=lambda x: bool(strtobool(x)), default=False,
                         help="for wandb usage.")
 
     # env parameters
+    parser.add_argument("--max_edge_dist", type=float, default=0.8, 
+                        help="Maximum distance above which edges cannot be connected between the entities")
     parser.add_argument("--env_name", type=str, default='MPE',
                         help="specify the name of environment")
     parser.add_argument("--episode_length", type=int, default=100,
@@ -134,17 +138,20 @@ def get_config():
                         help="time duration between contiunous twice models saving.")
     parser.add_argument("--log_interval", type=int, default=5,
                         help="time duration between contiunous twice log printing.")
+    parser.add_argument("--save_data", type=lambda x: bool(strtobool(x)), default=False, help='use to save data in training or rendering')
+    parser.add_argument("--reward_file_name", type=str, default=None, help="csv name of training reward.")
+    parser.add_argument("--cost_file_name", type=str, default=None, help="csv name of training cost.")
 
     # render parameters
     parser.add_argument("--save_gifs", action='store_true', default=True,
                         help="by default, do not save render video. If set, save video.")
-    parser.add_argument("--use_render", action='store_true', default=False,
+    parser.add_argument("--use_render", type=lambda x: bool(strtobool(x)), default=False,
                         help="render or train.")
     parser.add_argument("--render_episodes", type=int, default=1,
                         help="the number of episodes to render a given env")
     parser.add_argument("--ifi", type=float, default=0.1,
                         help="the play interval of each rendered image in saved video.")
-    parser.add_argument("--model_dir", type=str, default="xxx",
+    parser.add_argument("--model_dir", type=str, default=None,
                         help="by default None. set the path to pretrained model.")
 
     return parser

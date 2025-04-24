@@ -519,6 +519,7 @@ class MultiAgentGraphConstrainEnv(MultiAgentConstrainEnv):
                 obs_dim = len(observation_callback(agent, self.world)[0][0])
                 nodes_feats_shape = (max_N, obs_dim)
                 share_nodes_feats_shape = (num_agents, max_N, obs_dim)
+            # print("nodes_feats_shape", nodes_feats_shape)
             
             edge_index_shape = (2, self.max_Edges)
             edge_attr_shape = (self.max_Edges, observation_callback(agent, self.world)[2][0].size)
@@ -649,7 +650,7 @@ class MultiAgentGraphConstrainEnv(MultiAgentConstrainEnv):
                 # import rendering only if we need it
                 # (and don't import for headless machines)
                 # from gym.envs.classic_control import rendering
-                from macpo.envs.mpe_env.multiagent import rendering
+                from gsmarl.envs.mpe_env.multiagent import rendering
 
                 self.viewers[i] = rendering.Viewer(700, 700)
 
@@ -658,7 +659,7 @@ class MultiAgentGraphConstrainEnv(MultiAgentConstrainEnv):
             # import rendering only if we need it
             # (and don't import for headless machines)
             # from gym.envs.classic_control import rendering
-            from macpo.envs.mpe_env.multiagent import rendering
+            from gsmarl.envs.mpe_env.multiagent import rendering
 
             self.render_geoms = []
             self.render_geoms_xform = []

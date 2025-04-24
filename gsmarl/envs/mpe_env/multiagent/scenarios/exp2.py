@@ -2,7 +2,9 @@ import numpy as np
 from gsmarl.envs.mpe_env.multiagent.core import World, Agent, Landmark, Obstacle
 from gsmarl.envs.mpe_env.multiagent.scenario import BaseScenario
 import math
-
+'''
+random scenario
+'''
 
 class Scenario(BaseScenario):
     def make_world(self, args):
@@ -200,6 +202,7 @@ class Scenario(BaseScenario):
                     edge_index[1].append(i)
                     relative_state = np.hstack((obstacle.state.p_pos-entity_i.state.p_pos, obstacle.state.p_vel-entity_i.state.p_vel))
                     edge_feature.append(relative_state)
+
 
         return node_feature, edge_index, edge_feature
     

@@ -15,8 +15,24 @@ class MPERunner(Runner):
     def __init__(self, config):
         super(MPERunner, self).__init__(config)
         self.retrun_average_cost = 0
+        self.save_data = self.all_args.save_data
+        self.reward_file_name = self.all_args.reward_file_name
+        self.cost_file_name = self.all_args.cost_file_name
 
     def run(self):
+        if self.save_data:
+            #csv
+            print('save training data')
+            file = open(self.reward_file_name+'.csv', 'w', encoding='utf-8', newline="")
+            writer = csv.writer(file)
+            writer.writerow(['step', 'average', 'min', 'max', 'std'])
+            file.close()
+
+            file1 = open(self.cost_file_name+'.csv', 'w', encoding='utf-8', newline="")
+            writer = csv.writer(file1)
+            writer.writerow(['step', 'average', 'min', 'max', 'std'])
+            file1.close()
+
         self.warmup()
 
         start = time.time()
@@ -96,6 +112,20 @@ class MPERunner(Runner):
                 if len(done_episodes_rewards) > 0:
                     aver_episode_rewards = np.mean(done_episodes_rewards)
                     aver_episode_costs = np.mean(done_episodes_costs)
+                    min_r, max_r, std_r = np.min(done_episodes_rewards), np.max(done_episodes_rewards), np.std(done_episodes_rewards)
+                    min_c, max_c, std_c = np.min(done_episodes_costs), np.max(done_episodes_costs), np.std(done_episodes_costs)
+
+                    if self.save_data:
+                        file = open(self.reward_file_name+'.csv', 'a', encoding='utf-8', newline="")
+                        writer = csv.writer(file)
+                        writer.writerow([total_num_steps, aver_episode_rewards, min_r, max_r, std_r])
+                        file.close()
+
+                        file1 = open(self.cost_file_name+'.csv', 'a', encoding='utf-8', newline="")
+                        writer = csv.writer(file1)
+                        writer.writerow([total_num_steps, aver_episode_costs, min_c, max_c, std_c])
+                        file1.close()
+
                     self.return_aver_cost(aver_episode_costs)
                     print("some episodes done, average rewards: {}, average costs: {}".format(aver_episode_rewards,
                                                                                               aver_episode_costs))

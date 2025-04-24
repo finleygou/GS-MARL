@@ -44,6 +44,7 @@ class Entity(object):
         self.color = None
         # max speed and accel
         self.max_speed = None
+        self.max_accel = None
         self.accel = None
         # state
         self.state = EntityState()
@@ -70,11 +71,14 @@ class Obstacle(Entity):
         self.dummy = False
         # agents are movable by default
         self.movable = False
+        self.name = 'obstacle'
 
 # properties of agent entities
 class Agent(Entity):
     def __init__(self):
         super(Agent, self).__init__()
+        self.name = "agent"
+        self.id = None
         # agents are movable by default
         self.movable = True
         # cannot send communication signals
@@ -94,6 +98,11 @@ class Agent(Entity):
         # script behavior to execute
         self.action_callback = None
 
+class Target(Agent):
+    def __init__(self):
+        super(Target, self).__init__()
+        self.delta = 0.1
+        self.name = 'target'
 
 # multi-agent world
 class World(object):
@@ -102,6 +111,7 @@ class World(object):
         self.agents = []
         self.landmarks = []
         self.obstacles = []
+        self.targets = []
         # communication channel dimensionality
         self.dim_c = 0
         # position dimensionality
@@ -120,6 +130,7 @@ class World(object):
         self.cached_dist_vect = None
         self.cached_dist_mag = None
 
+        self.num_targets = 0
         self.num_agents = 0
         self.num_landmarks = 0
         self.num_obstacles = 0
@@ -153,7 +164,7 @@ class World(object):
     # return all entities in the world
     @property
     def entities(self):
-        return self.agents +  self.landmarks + self.obstacles
+        return self.agents +  self.landmarks + self.obstacles + self.targets
 
     # return all agents controllable by external policies
     @property
@@ -240,15 +251,21 @@ class World(object):
     def integrate_state(self, p_force):
         for i, entity in enumerate(self.entities):
             if not entity.movable: continue
-            entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
-            if (p_force[i] is not None):
-                entity.state.p_vel += (p_force[i] / entity.mass) * self.dt
-            if entity.max_speed is not None:
-                speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
-                if speed > entity.max_speed:
-                    entity.state.p_vel = entity.state.p_vel / np.sqrt(np.square(entity.state.p_vel[0]) +
-                                                                  np.square(entity.state.p_vel[1])) * entity.max_speed
-            entity.state.p_pos += entity.state.p_vel * self.dt
+            if 'agent' in entity.name:
+                entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
+                if (p_force[i] is not None):
+                    acc = p_force[i] / entity.mass
+                    if entity.max_accel is not None:
+                        acc = np.clip(acc, -entity.max_accel, entity.max_accel)
+                    entity.state.p_vel += acc * self.dt
+                if entity.max_speed is not None:
+                    speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
+                    if speed > entity.max_speed:
+                        entity.state.p_vel = entity.state.p_vel / np.sqrt(np.square(entity.state.p_vel[0]) +
+                                                                    np.square(entity.state.p_vel[1])) * entity.max_speed
+                entity.state.p_pos += entity.state.p_vel * self.dt
+            elif 'target' in entity.name:
+                entity.state.p_pos += entity.state.p_vel * self.dt
 
     def update_agent_state(self, agent):
         # set communication state (directly for now)
