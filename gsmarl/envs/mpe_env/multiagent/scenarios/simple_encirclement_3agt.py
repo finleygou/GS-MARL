@@ -12,7 +12,7 @@ class Scenario(BaseScenario):
         super().__init__()
         self.d_cap = 1.0
 
-        self.band_target = 0.1
+        self.band_target = 0.2
 
         self.angle_band_target = 0.3
         self.delta_angle_band = self.angle_band_target
@@ -58,7 +58,7 @@ class Scenario(BaseScenario):
         world.targets = [Target() for i in range(world.num_targets)]
         for i, target in enumerate(world.targets):
             target.name = 'target %d' % i
-            target.collide = False
+            target.collide = True
             target.silent = True
             target.size = 0.12
             target.movable = True
@@ -68,6 +68,7 @@ class Scenario(BaseScenario):
         # add obstacles
         world.obstacles = [Obstacle() for i in range(world.num_obstacles)]
         for i, obstacle in enumerate(world.obstacles):
+            obstacle.id = i
             obstacle.name = 'obstacle %d' % i
             obstacle.collide = True
             obstacle.silent = True
@@ -100,7 +101,9 @@ class Scenario(BaseScenario):
             target.state.p_vel = np.array([np.cos(vel_angle), np.sin(vel_angle)])*target.max_speed
             target.R = target.size
 
-        init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
+        # init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
+        
+        init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
         for i, obstacle in enumerate(world.obstacles):
             obstacle.state.p_pos = init_pos_obstacle[i]
             obstacle.state.p_vel = np.array([0.0, 0.0])
@@ -158,7 +161,7 @@ class Scenario(BaseScenario):
         dist_i_vec = target.state.p_pos - agent.state.p_pos
         dist_i = np.linalg.norm(dist_i_vec)  #与目标的距离
         d_i = dist_i - self.d_cap  # 剩余围捕距离
-        d_list = [np.linalg.norm(agent.state.p_pos - target.state.p_pos) - self.d_cap for agent in agents]   # left d for all agent
+        d_list = [np.linalg.norm(agt.state.p_pos - target.state.p_pos) - self.d_cap for agt in agents]   # left d for all agent
         [left_id, right_id], left_nb_angle, right_nb_angle = find_neighbors(agent, agents, target)  # nb:neighbor
         # find min d between allies
         d_min = 20
@@ -170,20 +173,41 @@ class Scenario(BaseScenario):
                 d_min = d_
 
         #################################
-        k1, k2, k3 = 0.2, 0.4, 0.8
-        w1, w2, w3 = 0.4, 0.1, 0.5
+        # k1, k2, k3 = 0.2, 0.4, 0.8
+        # w1, w2, w3 = 0.4, 0.4, 0.2
+
+        k1, k2, k3 = 0.2, 0.6, 0.2
+        w1, w2, w3 = 0.3, 0.5, 0.2
 
         # formaion reward r_f
         form_vec = np.array([0.0, 0.0])
         for agt in agents:
             dist_vec = agt.state.p_pos - target.state.p_pos
             form_vec = form_vec + dist_vec
+        norm_vec = np.linalg.norm(form_vec)
+        norm_dist = d_i**2
+        norm_angle = abs(left_nb_angle - self.exp_alpha) + abs(right_nb_angle - self.exp_alpha)
+
+        lft_angle_e = abs(left_nb_angle - self.exp_alpha)*180/np.pi
+        rgt_angle_e = abs(right_nb_angle - self.exp_alpha)*180/np.pi
+
+        # print("agent :{} dist: {} dist_e: {} left_an_e:{} right_an_e:{}".format(agent.id, dist_i, d_i, lft_angle_e, rgt_angle_e))
+        # print(norm_vec, norm_dist, norm_angle) # 8 8 6
+        '''
         r_f = np.exp(-k1*np.linalg.norm(form_vec))
         # distance coordination reward r_d
         r_d = np.exp(-k2*np.sum(np.square(d_list)))
         # single distance reward
-        r_l = np.exp(-k3*abs(d_list[agent.id]))
+        # r_l = np.exp(-k3*abs(d_list[agent.id]))
+        r_l = np.exp(-k3*abs(left_nb_angle - self.exp_alpha)) + np.exp(-k3*abs(right_nb_angle - self.exp_alpha))
+        '''
 
+        r_f = -k1*norm_vec
+        r_d = -k2*norm_dist
+        r_l = -k3*norm_angle
+        # print("r_f", r_f)
+        # print("r_d", r_d)
+        # print("r_l", r_l)
         # print(agent.id, d_list, d_list[agent.id])
 
         r_ca = 0
@@ -203,6 +227,8 @@ class Scenario(BaseScenario):
 
         r_step = w1*r_f + w2*r_d + w3*r_l + r_ca
 
+        # print("r_step", r_step)
+
         ####### calculate dones ########
         dones = []
         world.dist_error = 0
@@ -221,16 +247,18 @@ class Scenario(BaseScenario):
             agent.done = True
             target.done = True
             target.state.p_vel = np.array([0., 0.])
-            return 10+r_step
+            return 50+r_step
         else:  agent.done = False
 
         left_nb_done = True if (abs(left_nb_angle - self.exp_alpha)<self.delta_angle_band and abs(d_list[left_id])<self.d_lft_band) else False
         right_nb_done = True if (abs(right_nb_angle - self.exp_alpha)<self.delta_angle_band and abs(d_list[right_id])<self.d_lft_band) else False
 
         if abs(d_i)<self.d_lft_band and left_nb_done and right_nb_done: # 30°
-            return 5+r_step # terminate reward
+            return 30+r_step # terminate reward
         elif abs(d_i)<self.d_lft_band and (left_nb_done or right_nb_done): # 30°
-            return 2+r_step
+            return 20+r_step
+        elif abs(d_i)<self.d_lft_band: # 30°
+            return 10+r_step
         else:
             return r_step
 
@@ -256,10 +284,12 @@ class Scenario(BaseScenario):
                     relative_state = np.hstack((entity_j.state.p_pos-entity_i.state.p_pos, entity_j.state.p_vel-entity_i.state.p_vel))
                     edge_feature.append(relative_state)
 
+            # This part is very important, we manually add an edge between the target(landmark) and the agent even
+            # if the target is not in the communication range of the agent 
             # The Target of entity_i's view is added to the edge list
             target = world.targets[0]
             edge_num += 1
-            edge_index[0].append(world.num_agents+1)  # 1 for number of target
+            edge_index[0].append(world.num_agents+0)  # 1 for number of target with its id
             edge_index[1].append(i)
             relative_state = np.hstack((target.state.p_pos-entity_i.state.p_pos, target.state.p_vel-entity_i.state.p_vel))
             edge_feature.append(relative_state)
@@ -273,6 +303,9 @@ class Scenario(BaseScenario):
                     edge_index[1].append(i)
                     relative_state = np.hstack((obstacle.state.p_pos-entity_i.state.p_pos, obstacle.state.p_vel-entity_i.state.p_vel))
                     edge_feature.append(relative_state)
+
+        # print("node_feature", node_feature)
+        # print("edge_index", edge_index)
 
         return node_feature, edge_index, edge_feature
     

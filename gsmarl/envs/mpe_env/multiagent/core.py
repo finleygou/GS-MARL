@@ -129,6 +129,7 @@ class World(object):
         self.cache_dists = False
         self.cached_dist_vect = None
         self.cached_dist_mag = None
+        self.world_step = 0
 
         self.num_targets = 0
         self.num_agents = 0
@@ -164,7 +165,7 @@ class World(object):
     # return all entities in the world
     @property
     def entities(self):
-        return self.agents +  self.landmarks + self.obstacles + self.targets
+        return self.agents + self.landmarks + self.targets + self.obstacles
 
     # return all agents controllable by external policies
     @property
@@ -211,6 +212,9 @@ class World(object):
 
     # update state of the world
     def step(self):
+        self.world_step += 1
+        # print("step {}".format(self.world_step))
+
         # set actions for scripted agents 
         for agent in self.scripted_agents:
             agent.action = agent.action_callback(agent, self)

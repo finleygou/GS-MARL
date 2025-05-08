@@ -10,12 +10,14 @@ class ACTLayer(nn.Module):
         super(ACTLayer, self).__init__()
         self.mixed_action = False
         self.multi_discrete = False
+        self.box = False
         if action_space.__class__.__name__ == "Discrete":
             action_dim = action_space.n
             self.action_out = Categorical(inputs_dim, action_dim, use_orthogonal, gain)
         elif action_space.__class__.__name__ == "Box":
+            self.box = True
             action_dim = action_space.shape[0]
-            self.action_out = DiagGaussian(inputs_dim, action_dim, use_orthogonal, gain, args)
+            self.action_out = DiagGaussian(inputs_dim, action_dim, use_orthogonal, gain)
         elif action_space.__class__.__name__ == "MultiBinary":
             action_dim = action_space.shape[0]
             self.action_out = Bernoulli(inputs_dim, action_dim, use_orthogonal, gain)
@@ -63,9 +65,22 @@ class ACTLayer(nn.Module):
             actions = torch.cat(actions, -1)
             action_log_probs = torch.cat(action_log_probs, -1)
 
+        elif self.box:
+            actions = []
+            action_log_probs = []
+            action_logit = self.action_out(x)
+            action = action_logit.mode() if deterministic else action_logit.sample()  # mode: get average
+            action_log_prob = action_logit.log_probs(action)
+            action = torch.clamp(action, -1, 1, out=None)  # constrain to -1~1
+            actions.append(action)
+            action_log_probs.append(action_log_prob)
+            actions = torch.cat(actions, -1) # [ar,at]
+            action_log_probs = torch.cat(action_log_probs, -1)  # [lg p1, lg p2]
+
         else:
             action_logits = self.action_out(x, available_actions)
             actions = action_logits.mode() if deterministic else action_logits.sample()
+            actions = torch.clamp(actions, -1, 1, out=None)
             action_log_probs = action_logits.log_probs(actions)
 
         return actions, action_log_probs
@@ -81,6 +96,10 @@ class ACTLayer(nn.Module):
                 action_prob = action_logit.probs
                 action_probs.append(action_prob)
             action_probs = torch.cat(action_probs, -1)
+        elif self.box:
+            action_logit = self.action_out(x)
+            action_prob = action_logit.probs
+            action_probs = torch.cat(action_prob, -1)  # [p1, p2]
         else:
             action_logits = self.action_out(x, available_actions)
             action_probs = action_logits.probs
@@ -125,9 +144,16 @@ class ACTLayer(nn.Module):
 
             action_log_probs = torch.cat(action_log_probs, -1) # ! could be wrong
             dist_entropy = torch.tensor(dist_entropy).mean()
-
+        elif self.box:
+            action_logits = self.action_out(x)
+            action_log_probs = action_logits.log_probs(action)
+            if active_masks is not None:
+                dist_entropy = (action_logits.entropy()*active_masks.squeeze(-1)).sum()/active_masks.sum()
+            else:
+                dist_entropy = action_logits.entropy().mean()
         else:
             action_logits = self.action_out(x, available_actions)
+            action = torch.clamp(action, -1, 1, out=None)
             action_log_probs = action_logits.log_probs(action)
             if active_masks is not None:
                 dist_entropy = (action_logits.entropy()*active_masks).sum()/active_masks.sum()
@@ -177,9 +203,20 @@ class ACTLayer(nn.Module):
             action_log_probs = torch.cat(action_log_probs, -1)  # ! could be wrong
             dist_entropy = torch.tensor(dist_entropy).mean()
 
+        elif self.box:
+            action_logits = self.action_out(x)
+            action_log_probs = action_logits.log_probs(action)
+            action_mu = action_logits.mean
+            action_std = action_logits.stddev
+            if active_masks is not None:
+                dist_entropy = (action_logits.entropy()*active_masks).sum()/active_masks.sum()
+            else:
+                dist_entropy = action_logits.entropy().mean()
+
         else:
             if action[0][0] == torch.nan:
                 breakpoint()
+            action = torch.clamp(action, -1, 1, out=None)
             action_logits = self.action_out(x, available_actions)
             action_mu = action_logits.mean
             action_std = action_logits.stddev

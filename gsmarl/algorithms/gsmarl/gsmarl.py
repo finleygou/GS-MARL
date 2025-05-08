@@ -170,6 +170,10 @@ class GSMARL():
         std_old = std_old.detach()
         logstd_old = torch.log(std_old)
 
+        # Clamp std to prevent division-by-zero
+        # std = torch.clamp(std, min=1e-4, max=1.0)
+        # std_old = torch.clamp(std_old, min=1e-4, max=1.0)
+
         # kl divergence between old policy and new policy : D( pi_old || pi_new )
         # pi_old -> mu0, logstd0, std0 / pi_new -> mu, logstd, std
         # be careful of calculating KL-divergence. It is not symmetric metric

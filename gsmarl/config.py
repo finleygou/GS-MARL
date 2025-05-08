@@ -57,10 +57,8 @@ def get_config():
     # network parameters
     parser.add_argument("--hidden_size", type=int, default=64,
                         help="Dimension of hidden layers for actor/critic networks")
-    parser.add_argument("--use_popart", action='store_false', default=True,
-                        help="by default True, use running mean and std to normalize rewards.")
-    parser.add_argument("--use_valuenorm", action='store_false', default=True,
-                        help="by default True, use running mean and std to normalize rewards.")
+    parser.add_argument("--use_popart", action="store_false", default=True, help="by default False, use PopArt to normalize rewards.")
+    parser.add_argument("--use_valuenorm", action="store_false", default=True, help="by default True, use running mean and std to normalize rewards.")
     parser.add_argument("--use_orthogonal", action='store_false', default=True,
                         help="Whether to use Orthogonal initialization for weights and 0 initialization for biases")
     parser.add_argument("--gain", type=float, default=0.01,
@@ -80,9 +78,9 @@ def get_config():
     
     # optimizer parameters
     parser.add_argument("--lr", type=float, default=7e-3,
-                        help='learning rate (default: 5e-4)')
+                        help='learning rate (default: 7e-3)')
     parser.add_argument("--critic_lr", type=float, default=7e-3,
-                        help='critic learning rate (default: 5e-4)')
+                        help='critic learning rate (default: 7e-3)')
     parser.add_argument("--opti_eps", type=float, default=1e-5,
                         help='Adam optimizer epsilon (default: 1e-5)')
     parser.add_argument("--weight_decay", type=float, default=0)
@@ -104,7 +102,7 @@ def get_config():
                         help='value loss clip parameter (default: 0.2)')
     parser.add_argument("--value_loss_coef", type=float, default=1,
                         help='value loss coefficient (default: 0.5)')
-    parser.add_argument("--num_mini_batch", type=int, default=2,
+    parser.add_argument("--num_mini_batch", type=int, default=1,
                         help='number of batches for trpo (default: 1)')
     parser.add_argument("--use_max_grad_norm", action='store_false', default=True,
                         help="by default, use max norm of gradients. If set, do not use.")

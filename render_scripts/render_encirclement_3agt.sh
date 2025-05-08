@@ -25,7 +25,7 @@ python  ../gsmarl/scripts/render_mpe.py \
 --episode_length ${ep_lens} \
 --data_chunk_length 20 \
 --gain 0.01 \
---render_episodes 1 \
+--render_episodes 5 \
 --user_name "finleygou" \
---model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250423_200541-ws8qu3to/files/"
-done
+--model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250429_222546-kwz6hrx6/files/"
+done 

@@ -205,11 +205,13 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
-                    agent.action.u = action[0]
+                    agent.action.u = action[0][0:self.world.dim_p] # action[0]
             sensitivity = 5.0
             if agent.accel is not None:
                 sensitivity = agent.accel
-            agent.action.u *= sensitivity
+            # agent.action.u *= sensitivity
+            # print("agent.action.u", agent.action.u)
+            
             action = action[1:]
         if not agent.silent:
             # communication action
@@ -616,6 +618,7 @@ class MultiAgentGraphConstrainEnv(MultiAgentConstrainEnv):
                 index_1 = edge_idx[0][i]
                 index_2 = edge_idx[1][i]
                 edge_list.append([self.world.entities[index_1].name, self.world.entities[index_2].name])
+                # print("edge_list", edge_list)
             else:
                 break
         self.world.edge_list = np.array(edge_list)

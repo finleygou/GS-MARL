@@ -139,7 +139,7 @@ class Scenario(BaseScenario):
         dist_i_vec = target.state.p_pos - agent.state.p_pos
         dist_i = np.linalg.norm(dist_i_vec)  #与目标的距离
         d_i = dist_i - self.d_cap  # 剩余围捕距离
-        d_list = [np.linalg.norm(agent.state.p_pos - target.state.p_pos) - self.d_cap for agent in agents]   # left d for all agent
+        d_list = [np.linalg.norm(agt.state.p_pos - target.state.p_pos) - self.d_cap for agt in agents]   # left d for all agent
         [left_id, right_id], left_nb_angle, right_nb_angle = find_neighbors(agent, agents, target)  # nb:neighbor
         # find min d between allies
         d_min = 20
@@ -240,7 +240,7 @@ class Scenario(BaseScenario):
             # The Target of entity_i's view is added to the edge list
             target = world.targets[0]
             edge_num += 1
-            edge_index[0].append(world.num_agents+1)  # 1 for number of target
+            edge_index[0].append(world.num_agents+0)  # 1 for number of target
             edge_index[1].append(i)
             relative_state = np.hstack((target.state.p_pos-entity_i.state.p_pos, target.state.p_vel-entity_i.state.p_vel))
             edge_feature.append(relative_state)

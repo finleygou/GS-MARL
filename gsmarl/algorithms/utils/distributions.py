@@ -60,7 +60,29 @@ class Categorical(nn.Module):
             x[available_actions == 0] = -1e10
         return FixedCategorical(logits=x)
 
+class DiagGaussian(nn.Module):
+    def __init__(self, num_inputs, num_outputs, use_orthogonal=True, gain=0.01, args=None):
+        super(DiagGaussian, self).__init__()
 
+        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][use_orthogonal]
+        def init_(m): 
+            return init(m, init_method, lambda x: nn.init.constant_(x, 0), gain)
+
+        self.fc_mean = init_(nn.Linear(num_inputs, num_outputs))  # [mu1, mu2]
+        self.logstd = AddBias(torch.zeros(num_outputs))  # [sigma1, sigma2]
+
+    def forward(self, x):  # x是 上一层的输出向量。作为该层输入 
+        action_mean = self.fc_mean(x)
+
+        #  An ugly hack for my KFAC implementation.
+        zeros = torch.zeros(action_mean.size())
+        if x.is_cuda:
+            zeros = zeros.to(action_mean.device)
+
+        action_logstd = self.logstd(zeros)
+        return FixedNormal(action_mean, action_logstd.exp()) 
+
+'''
 class DiagGaussian(nn.Module):
     def __init__(self, num_inputs, num_outputs, use_orthogonal=True, gain=0.01, args=None):
         super(DiagGaussian, self).__init__()
@@ -80,6 +102,7 @@ class DiagGaussian(nn.Module):
         action_mean = self.fc_mean(x)
         action_std = torch.sigmoid(self.log_std / self.std_x_coef) * self.std_y_coef
         return FixedNormal(action_mean, action_std)
+'''
 
 class Bernoulli(nn.Module):
     def __init__(self, num_inputs, num_outputs, use_orthogonal=True, gain=0.01):
