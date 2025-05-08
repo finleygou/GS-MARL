@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from gsmarl.runner.base_runner import Runner
 import csv
+from gsmarl import global_var as glv
 
 
 def _t2n(x):
@@ -48,6 +49,9 @@ class MPERunner(Runner):
             done_episodes_rewards = []
             done_episodes_costs = []
 
+            CL_ratio = episode/episodes
+            glv.set_value('CL_ratio', CL_ratio)  #curriculum learning
+            self.envs.set_CL(glv.get_value('CL_ratio'))  # env_wrapper
             for step in range(self.episode_length):
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic, cost_preds, \
@@ -105,7 +109,8 @@ class MPERunner(Runner):
                               episodes,
                               total_num_steps,
                               self.num_env_steps,
-                              int(total_num_steps / (end - start))))
+                              int(total_num_steps / (end - start)),
+                              format(glv.get_value('CL_ratio'), '.3f')))
 
                 self.log_train(train_infos, total_num_steps)
 

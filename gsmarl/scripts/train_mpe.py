@@ -9,7 +9,10 @@ import torch
 from gsmarl.config import get_config
 from gsmarl.envs.mpe_env.make_env import make_env
 from gsmarl.envs.mpe_env.env_wrappers import SubprocVecEnv, DummyVecEnv
+from gsmarl import global_var as glv
 
+glv._init()
+glv.set_value('CL_ratio',0.0)
 
 def make_train_env(all_args):
     def get_env_fn(rank):

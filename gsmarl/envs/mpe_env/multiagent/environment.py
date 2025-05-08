@@ -4,6 +4,7 @@ from gym.envs.registration import EnvSpec
 import numpy as np
 from typing import Callable, List, Tuple, Dict, Union, Optional
 from gsmarl.envs.mpe_env.multiagent.multi_discrete import MultiDiscrete
+from gsmarl import global_var as glv
 
 
 class MultiAgentEnv(gym.Env):
@@ -223,6 +224,11 @@ class MultiAgentEnv(gym.Env):
             action = action[1:]
         # make sure we used all elements of action
         assert len(action) == 0
+
+    # set curriculumn learning ratio
+    def _set_CL(self, CL_ratio):
+        glv.set_value('CL_ratio', CL_ratio)
+        self.CL_ratio = glv.get_value('CL_ratio')
 
     # reset rendering assets
     def _reset_render(self):

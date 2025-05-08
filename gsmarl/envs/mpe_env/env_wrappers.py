@@ -174,6 +174,8 @@ def worker(remote, parent_remote, env_fn_wrapper):
                 remote.send(fr)
             elif data == "human":
                 env.render(mode=data)
+        elif cmd == 'set_cl':
+            env._set_CL(data)
         elif cmd == 'reset_task':
             ob = env.reset_task()
             remote.send(ob)
@@ -349,6 +351,8 @@ def shareworker(remote, parent_remote, env_fn_wrapper):
                 remote.send(fr)
             elif data == "human":
                 env.render(mode=data)
+        elif cmd == 'set_cl':
+            env._set_CL(data)
         elif cmd == 'close':
             env.close()
             remote.close()
@@ -452,6 +456,8 @@ def choosesimpleworker(remote, parent_remote, env_fn_wrapper):
                 remote.send(fr)
             elif data == "human":
                 env.render(mode=data)
+        elif cmd == 'set_cl':
+            env._set_CL(data)
         elif cmd == 'get_spaces':
             remote.send(
                 (env.observation_space, env.share_observation_space, env.action_space))
@@ -621,6 +627,8 @@ def chooseguardworker(remote, parent_remote, env_fn_wrapper):
         elif cmd == 'reset_task':
             ob = env.reset_task()
             remote.send(ob)
+        elif cmd == "set_cl":
+            remote.send(env._set_CL(data))
         elif cmd == 'close':
             env.close()
             remote.close()
@@ -746,6 +754,10 @@ class DummyVecEnv(ShareVecEnv):
                 env.render(mode=mode)
         else:
             raise NotImplementedError
+        
+    def set_CL(self, CL_ratio):
+        for env in self.envs:
+            env._set_CL(CL_ratio)
 
 
 
@@ -794,6 +806,10 @@ class ShareDummyVecEnv(ShareVecEnv):
         else:
             raise NotImplementedError
 
+    def set_CL(self, CL_ratio):
+        for env in self.envs:
+            env._set_CL(CL_ratio)
+
 
 class ChooseDummyVecEnv(ShareVecEnv):
     def __init__(self, env_fns):
@@ -832,6 +848,10 @@ class ChooseDummyVecEnv(ShareVecEnv):
         else:
             raise NotImplementedError
 
+    def set_CL(self, CL_ratio):
+        for env in self.envs:
+            env._set_CL(CL_ratio)
+
 class ChooseSimpleDummyVecEnv(ShareVecEnv):
     def __init__(self, env_fns):
         self.envs = [fn() for fn in env_fns]
@@ -866,3 +886,7 @@ class ChooseSimpleDummyVecEnv(ShareVecEnv):
                 env.render(mode=mode)
         else:
             raise NotImplementedError
+
+    def set_CL(self, CL_ratio):
+        for env in self.envs:
+            env._set_CL(CL_ratio)

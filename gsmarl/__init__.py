@@ -1,4 +1,4 @@
-from gsmarl import algorithms, envs, runner, scripts, utils, config
+from gsmarl import algorithms, envs, runner, scripts, utils, config, global_var
 
 __version__ = "0.1.0"
 
@@ -9,4 +9,5 @@ __all__ = [
     "scripts",
     "utils",
     "config",
+    "global_var",
 ]
