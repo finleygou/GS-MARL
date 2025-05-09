@@ -22,9 +22,9 @@ python  ../gsmarl/scripts/train_mpe.py \
 --hidden_size 64 \
 --num_targets 1 --num_agents 3 --num_obstacles 5 --num_landmarks 0 \
 --save_data "False" \
---reward_file_name "rew_enc_3agt_PS-v15" \
---cost_file_name "cost_enc_3agt_PS-v15" \
---kl_threshold 0.1 \
+--reward_file_name "0" \
+--cost_file_name "00" \
+--kl_threshold 0.2 \
 --parameter_share "True" \
 --use_curriculum "True" --cp 0.6 \
 --use_wandb "True" \
