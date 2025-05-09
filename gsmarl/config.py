@@ -130,6 +130,8 @@ def get_config():
                         help="the coef of line search step size")
 
     # run parameters
+    parser.add_argument("--cp", type=float, default=0.5, help='cp used in simple scenarios')
+    parser.add_argument("--use_curriculum", type=lambda x: bool(strtobool(x)), default=False, help='use curriculum learning during training')
     parser.add_argument("--use_linear_lr_decay", type=bool, default=False,
                         help='use a linear schedule on the learning rate')
     parser.add_argument("--save_interval", type=int, default=1,

@@ -2,7 +2,7 @@
 set -e
 # Run the script
 seed_max=1
-ep_lens=150
+ep_lens=200
 
 for seed in `seq ${seed_max}`;
 do
@@ -23,9 +23,9 @@ python  ../gsmarl/scripts/render_mpe.py \
 --use_render "True" \
 --parameter_share "True" \
 --episode_length ${ep_lens} \
---data_chunk_length 20 \
+--data_chunk_length 15 \
 --gain 0.01 \
 --render_episodes 5 \
 --user_name "finleygou" \
---model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250429_222546-kwz6hrx6/files/"
+--model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250509_020855-77gnes5i/files/"
 done 

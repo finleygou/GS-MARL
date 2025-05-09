@@ -3,6 +3,7 @@ from gsmarl.envs.mpe_env.multiagent.core import World, Agent, Landmark, Obstacle
 from gsmarl.envs.mpe_env.multiagent.scenario import BaseScenario
 from gsmarl.envs.mpe_env.multiagent.scenarios.util import *
 import math
+from gsmarl import global_var as glv
 '''
 3 agent encirclement scenario
 '''
@@ -12,19 +13,23 @@ class Scenario(BaseScenario):
         super().__init__()
         self.d_cap = 1.0
 
-        self.band_target = 0.2
-
+        self.band_init = 0.25
+        self.band_target = 0.1
+        self.angle_band_init = 1.0
         self.angle_band_target = 0.3
         self.delta_angle_band = self.angle_band_target
         self.d_lft_band = self.band_target
         self.dleft_lb = self.d_cap - self.d_lft_band
 
-        self.penalty_target = 5
+        self.penalty_start = 2
+        self.penalty_target = 10
         self.penalty = self.penalty_target
 
     def make_world(self, args):
         world = World()
         world.world_length = args.episode_length
+        self.use_CL = args.use_curriculum
+        self.cp = args.cp
         self.sensor_range = args.max_edge_dist
         self.communication_range = args.max_edge_dist
         # set any world properties first
@@ -101,9 +106,8 @@ class Scenario(BaseScenario):
             target.state.p_vel = np.array([np.cos(vel_angle), np.sin(vel_angle)])*target.max_speed
             target.R = target.size
 
-        # init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
-        
-        init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
+        init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
+        # init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
         for i, obstacle in enumerate(world.obstacles):
             obstacle.state.p_pos = init_pos_obstacle[i]
             obstacle.state.p_vel = np.array([0.0, 0.0])
@@ -153,7 +157,23 @@ class Scenario(BaseScenario):
         dist_min = (agent1.size + agent2.size)
         return True if dist < dist_min else False
 
+    def set_CL(self, CL_ratio, world):
+
+        if CL_ratio < self.cp:
+            self.d_lft_band = self.band_init - (self.band_init - self.band_target)*CL_ratio/self.cp
+            self.delta_angle_band = self.angle_band_init - (self.angle_band_init - self.angle_band_target)*CL_ratio/self.cp
+            self.dleft_lb = (self.d_cap - self.d_lft_band)*CL_ratio/self.cp
+            self.penalty = self.penalty_start + (self.penalty_target - self.penalty_start)*CL_ratio/self.cp
+        else:
+            self.d_lft_band = self.band_target
+            self.delta_angle_band = self.angle_band_target
+            self.dleft_lb = self.d_cap - self.band_target
+            self.penalty = self.penalty_target
+
     def reward(self, agent, world):
+        if self.use_CL:
+            self.set_CL(glv.get_value('CL_ratio'), world)
+
         r_step = 0
         target = world.targets[0]  # moving target
         agents = world.agents
@@ -188,8 +208,8 @@ class Scenario(BaseScenario):
         norm_dist = d_i**2
         norm_angle = abs(left_nb_angle - self.exp_alpha) + abs(right_nb_angle - self.exp_alpha)
 
-        lft_angle_e = abs(left_nb_angle - self.exp_alpha)*180/np.pi
-        rgt_angle_e = abs(right_nb_angle - self.exp_alpha)*180/np.pi
+        lft_angle_e = abs(left_nb_angle - self.exp_alpha)  # *180/np.pi
+        rgt_angle_e = abs(right_nb_angle - self.exp_alpha) # *180/np.pi
 
         # print("agent :{} dist: {} dist_e: {} left_an_e:{} right_an_e:{}".format(agent.id, dist_i, d_i, lft_angle_e, rgt_angle_e))
         # print(norm_vec, norm_dist, norm_angle) # 8 8 6
@@ -240,8 +260,8 @@ class Scenario(BaseScenario):
             if di_adv_lft<self.d_lft_band and di_adv>self.dleft_lb and abs(left_nb_angle_ - self.exp_alpha)<self.delta_angle_band and abs(right_nb_angle_ - self.exp_alpha)<self.delta_angle_band: # 30°
                 dones.append(True)
             else: dones.append(False)
-            world.dist_error += abs(di_adv_lft)
-            world.angle_error += (abs(left_nb_angle_ - self.exp_alpha) + abs(right_nb_angle_ - self.exp_alpha))
+            # world.dist_error += abs(di_adv_lft)
+            # world.angle_error += (abs(left_nb_angle_ - self.exp_alpha) + abs(right_nb_angle_ - self.exp_alpha))
         # print(dones)
         if all(dones)==True:  
             agent.done = True

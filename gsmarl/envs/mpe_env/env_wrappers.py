@@ -251,6 +251,9 @@ class GuardSubprocVecEnv(ShareVecEnv):
             p.join()
         self.closed = True
 
+    def set_CL(self, CL_ratio):
+        for remote in self.remotes:
+            remote.send(('set_cl', CL_ratio))
 
 class SubprocVecEnv(ShareVecEnv):
     def __init__(self, env_fns, spaces=None):
@@ -323,6 +326,9 @@ class SubprocVecEnv(ShareVecEnv):
             frame = [remote.recv() for remote in self.remotes]
             return np.stack(frame) 
 
+    def set_CL(self, CL_ratio):
+        for remote in self.remotes:
+            remote.send(('set_cl', CL_ratio))
 
 def shareworker(remote, parent_remote, env_fn_wrapper):
     parent_remote.close()
