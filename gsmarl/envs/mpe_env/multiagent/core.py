@@ -103,6 +103,19 @@ class Target(Agent):
         super(Target, self).__init__()
         self.delta = 0.1
         self.name = 'target'
+        self.pts = None
+    
+    def get_pts(self, N, d=1):
+        pts = []
+        init_theta = np.arctan2(self.state.p_vel[1], self.state.p_vel[0])+np.pi/N
+        for i in range(N):
+            theta = init_theta + i*2*np.pi/N
+            x = self.state.p_pos[0] + d*np.cos(theta)
+            y = self.state.p_pos[1] + d*np.sin(theta)
+            pts.append([x, y])
+        
+        self.pts = pts
+        return pts
 
 # multi-agent world
 class World(object):
@@ -274,6 +287,7 @@ class World(object):
                 entity.state.p_pos += entity.state.p_vel * self.dt
             elif 'target' in entity.name:
                 entity.state.p_pos += entity.state.p_vel * self.dt
+                entity.pts = entity.get_pts(self.num_agents, d=1)
 
     def update_agent_state(self, agent):
         # set communication state (directly for now)

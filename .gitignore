@@ -161,6 +161,7 @@ dmypy.json
 __pycache__
 results
 *.pyc
+*.cpython-37.pyc
 /gifs/
 build
 win_rate

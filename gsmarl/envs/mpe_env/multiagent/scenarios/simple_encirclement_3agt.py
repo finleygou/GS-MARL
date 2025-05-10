@@ -22,7 +22,7 @@ class Scenario(BaseScenario):
         self.dleft_lb = self.d_cap - self.d_lft_band
 
         self.penalty_start = 2
-        self.penalty_target = 10
+        self.penalty_target = 5
         self.penalty = self.penalty_target
 
     def make_world(self, args):
@@ -105,6 +105,7 @@ class Scenario(BaseScenario):
             vel_angle = np.random.uniform(np.pi/3, 2*np.pi/3)
             target.state.p_vel = np.array([np.cos(vel_angle), np.sin(vel_angle)])*target.max_speed
             target.R = target.size
+            target.pts = target.get_pts(self.num_agents, self.d_cap)
 
         init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
         # init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
@@ -191,6 +192,11 @@ class Scenario(BaseScenario):
             d_ = np.linalg.norm(agt.state.p_pos - agent.state.p_pos)
             if d_ < d_min:
                 d_min = d_
+
+        # print(target.state.p_pos, target.pts)
+
+        desire_pt = target.pts[agent.id]
+        d_i = np.linalg.norm(desire_pt - agent.state.p_pos)  # 剩余围捕距离
 
         #################################
         # k1, k2, k3 = 0.2, 0.4, 0.8
