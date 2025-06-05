@@ -98,7 +98,7 @@ These figures show the average step rewards per agent and average step costs per
 
 * Cooperative polygon tasks
 
-<img src="polygon/formation_reward.png" alt="formation_reward" style="height: 200px; " />  <img src="demo/polygon/formation_cost.png" alt="formation_cost" style="height: 200px; " />
+<img src="demo/polygon/formation_reward.png" alt="formation_reward" style="height: 200px; " />  <img src="demo/polygon/formation_cost.png" alt="formation_cost" style="height: 200px; " />
 
 * Cooperative line tasks
 
