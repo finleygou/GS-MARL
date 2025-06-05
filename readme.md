@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implementation of *Scalable Safe Multi-Agent Reinforcement Learning for Multi-Agent System*
+Implementation of *Graph based Safe Multi-Agent Reinforcement Learning for Multi-Agent System*
 
 ## Dependencies & Installation
 
@@ -20,7 +20,7 @@ pip intall -e.
 ## Run
 
 ### Environment
-We have modified the Multi-agent Particle Environment (MPE) to better facilitate Safe Multi-Agent Reinforcement Learning (MARL) algorithms. The modifications are implemented in the `gsmarl/envs/mpe_env/multiagent/environment.py` file, 
+We have modified the Multi-agent Particle Environment (MPE) to better facilitate Graph based Safe Multi-Agent Reinforcement Learning (MARL) algorithms. The modifications are implemented in the `gsmarl/envs/mpe_env/multiagent/environment.py` file, 
 where we have defined three types of environments to accommodate different MARL algorithms.
 * `MultiAgentEnv`:   
 Base class for other environment classes.   
