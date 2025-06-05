@@ -107,8 +107,8 @@ class Scenario(BaseScenario):
             target.R = target.size
             target.pts = target.get_pts(self.num_agents, self.d_cap)
 
-        init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
-        # init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
+        # init_pos_obstacle = np.array([[-1.38, 1.44], [-0.44, 0.88], [-0.5, 2.44], [0.70, 1.10], [1.0, 2.06]])
+        init_pos_obstacle = np.array([[-2,-5], [-1,-5], [0,-5], [1,-5], [2,-5]])
         for i, obstacle in enumerate(world.obstacles):
             obstacle.state.p_pos = init_pos_obstacle[i]
             obstacle.state.p_vel = np.array([0.0, 0.0])
@@ -202,8 +202,8 @@ class Scenario(BaseScenario):
         # k1, k2, k3 = 0.2, 0.4, 0.8
         # w1, w2, w3 = 0.4, 0.4, 0.2
 
-        k1, k2, k3 = 0.2, 0.6, 0.2
-        w1, w2, w3 = 0.3, 0.5, 0.2
+        k1, k2, k3 = 0.1, 0.8, 0.3
+        w1, w2, w3 = 0.2, 0.6, 0.2
 
         # formaion reward r_f
         form_vec = np.array([0.0, 0.0])

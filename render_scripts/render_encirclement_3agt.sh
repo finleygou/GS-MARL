@@ -27,5 +27,5 @@ python  ../gsmarl/scripts/render_mpe.py \
 --gain 0.01 \
 --render_episodes 5 \
 --user_name "finleygou" \
---model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250509_020855-77gnes5i/files/"
+--model_dir "/data/goufandi_space/Projects/GS-MARL/gsmarl/results/MPE/simple_encirclement_3agt/gsmarl/check/wandb/run-20250510_111558-ecbmolo0/files/"
 done 

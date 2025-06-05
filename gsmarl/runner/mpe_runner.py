@@ -320,6 +320,7 @@ class MPERunner(Runner):
                                                                    deterministic=True)
                     action = action.detach().cpu().numpy()
                     temp_actions_env = list(action.reshape(-1, 1, 2))
+                    rnn_states[:, 0] = _t2n(rnn_state)
                 else:
                     for agent_id in range(self.num_agents):
                         self.trainer[agent_id].prep_rollout()
