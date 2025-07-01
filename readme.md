@@ -1,3 +1,4 @@
+# The main code will be open sourced after the paper being accepted
 # GS-MARL
 
 ## Overview
