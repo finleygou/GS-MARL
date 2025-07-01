@@ -1,4 +1,7 @@
-# The main code will be open sourced after the paper is accepted
+# The main code will be open sourced after the paper is accepted, and it is hidden during review.
+
+# The GIF is loading a bit slowly due to network issue, please be patient.
+
 # GS-MARL
 
 ## Overview
