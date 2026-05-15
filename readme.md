@@ -4,6 +4,9 @@
 
 Implementation of *Scalable Safe Multi-Agent Reinforcement Learning for Multi-Agent System*
 
+## Optimized Version
+We have improved the code by adding the graph share buffer and test cases. The optimized version is available in [`optimized_version`(scalable-safe MARL, new_dev branch)](https://github.com/Qeneb/SS-MARL/tree/new_dev). You can also try this version for training and testing GS-MARL.
+
 ## Dependencies & Installation
 
 We recommend to use CONDA to install the requirements:
